@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1402082601 source:f:\users\calle\documents\codeblocks\noafk\main.cpp
+	<windows.h>
+	"Tchar.h"
+	<stdio.h>
+	<iostream>
+	<string>
+
