@@ -1,50 +1,92 @@
 #define WINVER 0x0500
 #include <windows.h>
-#include "Tchar.h"
+#include <Tchar.h>
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <time.h>
+#include "Dik.h" //http://www.gamespp.com/directx/directInputKeyboardScanCodes.html
 using namespace std;
 
+//ERROR cases
 #define noKeyPress 0
 #define noKeyRelease 1
 #define windowNotFound 2
 #define noForeground 3
 
+//keyFlags
 #define KeyDown 0x0000
 #define KeyUp 0x0002
 #define Scancode 0x0008
 
 bool running;
+int interval;
+time_t startTime;
+TCHAR windowtext[MAX_PATH];
 HWND window;
 
-void error(int err)
+void Error(int err)
 {
     switch(err)
     {
-        case 0:
+        case noKeyPress:
             cout << "Failed to send key. Aborting!" << endl;
             break;
-        case 1:
+        case noKeyRelease:
             cout << "Failed to release key. Aborting!" << endl;
             break;
-        case 2:
+        case windowNotFound:
             cout << "Window not found!" << endl;
             break;
-        case 3:
+        case noForeground:
             cout << "Failed to put window to foreground. Aborting!" << endl;
             break;
     }
     running = 0;
 }
 
-void wait(long seconds)
+void Wait(long seconds)
 {
-	seconds = seconds * 1000;
-	Sleep(seconds);
+    //Loop here because we need to check for user input
+	for(int i = 0; i<seconds; i++)
+    {
+        if(GetAsyncKeyState(VK_ESCAPE))
+        {
+            running = false;
+            break;
+        }
+        else
+            Sleep(1000);
+    }
 }
 
+void GiveInfo(bool newKeystroke)
+{
+    static int NOT = 0;
+    system("CLS");
 
+    if(newKeystroke)
+    {
+        cout << "*****************************************" << endl
+             << "Window: " << windowtext << endl
+             << "Interval: " << interval << endl
+             << "Simulated keystrokes: " << ++NOT << endl
+             << "Amount of time since first keystroke: " << difftime(time(NULL), startTime) << endl
+             << "*****************************************" << endl
+             << "Press ESC to exit..." << endl;
+    }
+
+    else
+    {
+        cout << "Total amount of keystrokes this session: " << NOT << endl
+             << "Approx amount of time since first keystroke: " << difftime(time(NULL), startTime)
+             << " seconds" <<endl;
+    }
+
+}
+
+//Basically as low we can get without writing a new
+//input driver. For some games this might not work.
 static bool SendKey(short keyCode, int keyFlag )
 {
      INPUT* InputData = new INPUT[1];
@@ -61,12 +103,11 @@ static bool SendKey(short keyCode, int keyFlag )
 
 static bool PressKey(short key)
 {
-    if(!SendKey(key, 0 | Scancode) ) error(noKeyPress);
-    wait(2);
-    if(!SendKey(key, KeyUp | Scancode) ) error(noKeyRelease);
+    if(!SendKey(key, KeyDown | Scancode) ) Error(noKeyPress);
+    Wait(2);    //To make sure the application pick up on the keypress
+    if(!SendKey(key, KeyUp | Scancode) ) Error(noKeyRelease);
 
     return 1;
-
 
 }
 
@@ -75,7 +116,6 @@ static bool FindProgram(const char* program)
     // Get first window on desktop
     HWND firstwindow = FindWindowEx(NULL, NULL, NULL, NULL);
     window = firstwindow;
-    TCHAR windowtext[MAX_PATH];
 
     // We need to get the console title in case we
     // accidentally match the search word with it
@@ -85,50 +125,64 @@ static bool FindProgram(const char* program)
 
     while(1)
     {
-        //fprintf(stderr, ".");
         // Check window title for a match
         GetWindowText(window, windowtext, MAX_PATH);
-        if (strstr(windowtext, program) != NULL &&
-            strcmp(windowtext, consoletitle) != 0) break;
+        if (strstr(windowtext, program) != NULL && strcmp(windowtext, consoletitle) != 0)
+                break;
 
         // Get next window
         window = FindWindowEx(NULL, window, NULL, NULL);
         if (window == NULL || window == firstwindow)
         {
-            error(windowNotFound);
+            Error(windowNotFound);
             return 0;
         }
     }
     cout << "Window found : " << windowtext << endl;
+
     return 1;
 }
 
 
 int main()
 {
-    int interval;
-
     char prog[100];
     bool foreground = 1;
 
     do{
-        cout << "Name of program to attatch to (if none enter NULL): ";
+        cout <<  "What window should I attach to? If none enter 'manual': " ;
         cin.getline(prog, 100);
-        if(strstr(prog, "NULL")){foreground = 0; break;}
+
+        if(strstr(prog, "manual"))
+        {
+            foreground = 0;
+            strcpy(windowtext, "Manual");
+            break;
+        }
+
     }while(!FindProgram(prog) );
 
-    cout << "Choose interval between keypress (seconds): ";
+
+    cout << "Choose interval between key simulations (min 2 seconds): ";
     cin >> interval;
 
+    if(interval<2)      //We are already waiting 2 sec between press and release
+        interval = 2;
+
     running = 1;
+    time(&startTime);
     while(running)
     {
-        wait(interval);
+        Wait(interval-2);
         if(foreground == 1)
-            if(!SetForegroundWindow(window) ) error(noForeground);
-        PressKey(57);   //http://www.comptechdoc.org/os/linux/howlinuxworks/linux_hlkeycodes.html
+            if(!SetForegroundWindow(window) )
+                Error(noForeground);
+
+        PressKey(DIK_SPACE);
+        GiveInfo(true);
     }
 
+    GiveInfo(false);
     system("pause");
 
     return 0;

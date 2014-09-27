@@ -1,8 +1,12 @@
 # depslib dependency file v1.0
-1402082601 source:f:\users\calle\documents\codeblocks\noafk\main.cpp
+1411795986 source:f:\users\calle\documents\codeblocks\noafk\main.cpp
 	<windows.h>
-	"Tchar.h"
+	<Tchar.h>
 	<stdio.h>
 	<iostream>
 	<string>
+	<time.h>
+	"Dik.h"
+
+1411791549 f:\users\calle\documents\codeblocks\noafk\dik.h
 
