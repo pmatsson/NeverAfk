@@ -30,7 +30,7 @@ do the following:
 1) Make sure this program (the bot) is running with admin 
 privilege (right-click, run as administrator)
 
-2) If you are using a full screen application try changing it to 
+2) If you are using a fullscreen application try changing it to 
 windowed mode or borderless windowed mode.
 
 3) A few games use driver level input there is not much we can do.
