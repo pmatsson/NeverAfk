@@ -17,7 +17,7 @@ game (when using window mode) and you should see the window name.
 
 Q - Can I get banned for using this application?
 ******************************************************************************
-It's a low risk but it's entirely possible. You are most likely to get banned
+It's a low risk but entirely possible. You are most likely to get banned
 from in game reports not from anti-cheat software. Some mice and keyboards 
 use similar inputs for their macro functions.
 ******************************************************************************
@@ -34,4 +34,9 @@ privilege (right-click, run as administrator)
 windowed mode or borderless windowed mode.
 
 3) A few games use driver level input there is not much we can do.
+******************************************************************************
+
+Q - What OS is supported?
+******************************************************************************
+Windows only
 ******************************************************************************
