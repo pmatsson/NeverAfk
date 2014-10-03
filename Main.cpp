@@ -4,27 +4,30 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <time.h>
-#include "Dik.h" //http://www.gamespp.com/directx/directInputKeyboardScanCodes.html
+#include <limits>
+
 using namespace std;
+
+//Version
+#define VERSION 1.2
 
 //ERROR cases
 #define noKeyPress 0
 #define noKeyRelease 1
 #define windowNotFound 2
 #define noForeground 3
+#define batError 4
 
-//keyFlags
-#define KeyDown 0x0000
-#define KeyUp 0x0002
-#define Scancode 0x0008
+//delay between key press and key release
+#define inputDelay 1
 
-bool running;
+//global variables
 int interval;
-time_t startTime;
 TCHAR windowtext[MAX_PATH];
 HWND window;
 
+
+//Error handling
 void Error(int err)
 {
     switch(err)
@@ -41,76 +44,56 @@ void Error(int err)
         case noForeground:
             cout << "Failed to put window to foreground. Aborting!" << endl;
             break;
+        case batError:
+            cout << "The program is not running or the batfile is corrupt!" << endl;
+            break;
     }
-    running = 0;
+   // running = false;
 }
 
-void Wait(long seconds)
+//Custom sleep function
+bool Wait(long seconds)
 {
     //Loop here because we need to check for user input
 	for(int i = 0; i<seconds; i++)
     {
         if(GetAsyncKeyState(VK_ESCAPE))
         {
-            running = false;
-            break;
+            return false;
         }
-        else
             Sleep(1000);
     }
+    return true;
 }
+
+void info()
+{
+    cout << "\n\t\t*************************\n";
+    cout <<   "\t\t*   ~~ NEVER AFK ~~     *\n" ;
+    cout <<   "\t\t*      BETA v. "
+                      << VERSION << "      *\n" ;
+    cout <<   "\t\t*    Made by Cazze :D   *\n";
+    cout <<   "\t\t************************* \n\n";
+}
+
 
 void GiveInfo(bool newKeystroke)
 {
     static int NOT = 0;
     system("CLS");
-
+    info();
     if(newKeystroke)
     {
-        cout << "*****************************************" << endl
+        cout << endl
              << "Window: " << windowtext << endl
-             << "Interval: " << interval << endl
+             << "Interval: " << interval << " sec" << endl
              << "Simulated keystrokes: " << ++NOT << endl
-             << "Amount of time since first keystroke: " << difftime(time(NULL), startTime) << endl
-             << "*****************************************" << endl
+             << endl
              << "Press ESC to exit..." << endl;
     }
-
-    else
-    {
-        cout << "Total amount of keystrokes this session: " << NOT << endl
-             << "Approx amount of time since first keystroke: " << difftime(time(NULL), startTime)
-             << " seconds" <<endl;
-    }
-
 }
 
-//Basically as low we can get without writing a new
-//input driver. For some games this might not work.
-static bool SendKey(short keyCode, int keyFlag )
-{
-     INPUT* InputData = new INPUT[1];
-
-     InputData[0].type = 1;
-     InputData[0].ki.wScan = keyCode;
-     InputData[0].ki.dwFlags = (int)keyFlag;
-     InputData[0].ki.time = 0;
-     InputData[0].ki.dwExtraInfo = 0;
-
-     return SendInput(1, InputData, sizeof(INPUT));
-
-}
-
-static bool PressKey(short key)
-{
-    if(!SendKey(key, KeyDown | Scancode) ) Error(noKeyPress);
-    Wait(2);    //To make sure the application pick up on the keypress
-    if(!SendKey(key, KeyUp | Scancode) ) Error(noKeyRelease);
-
-    return 1;
-
-}
-
+//Search for the user specified window
 static bool FindProgram(const char* program)
 {
     // Get first window on desktop
@@ -138,55 +121,101 @@ static bool FindProgram(const char* program)
             return 0;
         }
     }
+
     cout << "Window found : " << windowtext << endl;
 
     return 1;
 }
 
+int ValidInputInt()
+{
+    int result;
+    cin >> result;
 
-int main()
+    if(!cin)
+    {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Invalid input! Enter a number please." << endl;
+        return -1;
+    }
+    else
+        return result;
+}
+
+
+//Handle user input
+void InputHandler()
 {
     char prog[100];
-    bool foreground = 1;
 
     do{
-        cout <<  "What window should I attach to? If none enter 'manual': " ;
+        cout <<  "\Name the window that should receive the key simulations: " ;
         cin.getline(prog, 100);
-
-        if(strstr(prog, "manual"))
-        {
-            foreground = 0;
-            strcpy(windowtext, "Manual");
-            break;
-        }
-
     }while(!FindProgram(prog) );
 
+    do{
+        cout << "\nChoose interval between key simulations (min 2 seconds): ";
+        interval = ValidInputInt();
+    }while(interval<0);
+}
 
-    cout << "Choose interval between key simulations (min 2 seconds): ";
-    cin >> interval;
-
-    if(interval<2)      //We are already waiting 2 sec between press and release
-        interval = 2;
-
-    running = 1;
-    time(&startTime);
-    while(running)
+bool InputHandler(const char* inputWindowText, int inputInterval )
+{
+    if(!FindProgram(inputWindowText ))
     {
-        Wait(interval-2);
-        if(foreground == 1)
-            if(!SetForegroundWindow(window) )
-                Error(noForeground);
+        Error(batError);
+        return false;
+    }
+    strcpy(windowtext, inputWindowText);
+    interval = inputInterval;
+    return true;
+}
 
-        PressKey(DIK_SPACE);
-        GiveInfo(true);
+void PostKey(UINT key)
+{
+   // UINT key = 0x20; // Space
+    PostMessage(window, WM_KEYDOWN, key, 0);
+    Sleep(inputDelay*1000);
+    PostMessage(window, WM_KEYUP, key, 0);
+}
+
+
+
+int main(int argc, char *argv[])
+{
+    bool running=true;
+
+    info();
+    if(argc < 2)
+    {
+        InputHandler();
+    }
+    else
+    {
+        if(!InputHandler(argv[1],atoi(argv[2])) )
+            running = false;
     }
 
-    GiveInfo(false);
-    system("pause");
+    if(interval < inputDelay)      //We are already waiting inputDelay(s) between press and release
+        interval = inputDelay;
+
+    while(running)
+    {
+        PostKey(0x20);
+        GiveInfo(true);
+        if(!Wait(interval-inputDelay))
+            running = false;
+    }
+
+    //GiveInfo(false);
+    cout << "\nThe program will now exit...\n";
+    Sleep(5000);
 
     return 0;
 
 }
+
+
 
 

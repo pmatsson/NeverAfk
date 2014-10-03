@@ -1,7 +1,7 @@
 #ifndef H_DIK
 #define H_DIK
-
 // Listed are keyboard scan code constants, taken from dinput.h
+
 
 #define DIK_ESCAPE          0x01
 #define DIK_1               0x02

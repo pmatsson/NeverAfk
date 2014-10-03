@@ -31,7 +31,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Dik.h" />
 		<Unit filename="Main.cpp" />
 		<Extensions>
 			<code_completion />
