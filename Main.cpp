@@ -48,7 +48,6 @@ void Error(int err)
             cout << "The program is not running or the batfile is corrupt!" << endl;
             break;
     }
-   // running = false;
 }
 
 //Custom sleep function
@@ -61,12 +60,12 @@ bool Wait(long seconds)
         {
             return false;
         }
-            Sleep(1000);
+        Sleep(1000);
     }
     return true;
 }
 
-void info()
+void Info()
 {
     cout << "\n\t\t*************************\n";
     cout <<   "\t\t*   ~~ NEVER AFK ~~     *\n" ;
@@ -76,12 +75,11 @@ void info()
     cout <<   "\t\t************************* \n\n";
 }
 
-
 void GiveInfo(bool newKeystroke)
 {
     static int NOT = 0;
     system("CLS");
-    info();
+    Info();
     if(newKeystroke)
     {
         cout << endl
@@ -143,14 +141,13 @@ int ValidInputInt()
         return result;
 }
 
-
 //Handle user input
 void InputHandler()
 {
     char prog[100];
 
     do{
-        cout <<  "\Name the window that should receive the key simulations: " ;
+        cout <<  "\nName the window that should receive the key simulations: " ;
         cin.getline(prog, 100);
     }while(!FindProgram(prog) );
 
@@ -174,7 +171,6 @@ bool InputHandler(const char* inputWindowText, int inputInterval )
 
 void PostKey(UINT key)
 {
-   // UINT key = 0x20; // Space
     PostMessage(window, WM_KEYDOWN, key, 0);
     Sleep(inputDelay*1000);
     PostMessage(window, WM_KEYUP, key, 0);
@@ -186,7 +182,7 @@ int main(int argc, char *argv[])
 {
     bool running=true;
 
-    info();
+    Info();
     if(argc < 2)
     {
         InputHandler();
@@ -202,13 +198,12 @@ int main(int argc, char *argv[])
 
     while(running)
     {
-        PostKey(0x20);
+        PostKey(0x20);  //Press space, change this to whatever key you want
         GiveInfo(true);
         if(!Wait(interval-inputDelay))
             running = false;
     }
 
-    //GiveInfo(false);
     cout << "\nThe program will now exit...\n";
     Sleep(5000);
 
