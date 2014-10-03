@@ -1,0 +1,47 @@
+//#include "Dik.h" //http://www.gamespp.com/directx/directInputKeyboardScanCodes.html
+
+#define KeyDown 0x0000
+#define KeyUp 0x0002
+#define Scancode 0x0008
+
+
+/*
+void Mode1()
+{
+    if(foreground == true)
+        if(!SetForegroundWindow(window) )
+            Error(noForeground);
+
+    PressKey(DIK_SPACE); //TODO: MAP with all keys so user can choose
+}
+*/
+
+
+
+/*
+//Basically as low we can get without writing a new
+//input driver. For some games this might not work.
+static bool SendKey(short keyCode, int keyFlag )
+{
+     INPUT* InputData = new INPUT[1];
+
+     InputData[0].type = (__int32)INPUT_KEYBOARD;
+     InputData[0].ki.wScan = (short)keyCode;
+     InputData[0].ki.dwFlags = (int)keyFlag;
+     InputData[0].ki.time = 0;
+     InputData[0].ki.dwExtraInfo = 0;
+
+     return SendInput(1, InputData, sizeof(INPUT));
+
+}
+
+//Handle keyflags and input delay
+static bool PressKey(short key)
+{
+    if(!SendKey(key, KeyDown | Scancode) ) Error(noKeyPress);
+    Wait(inputDelay);    //To make sure the application have time to pick up on the key press
+    if(!SendKey(key, KeyUp | Scancode) ) Error(noKeyRelease);
+
+    return 1;
+
+}*/
