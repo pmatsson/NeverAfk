@@ -1,1 +1,0 @@
-start "" "%~dp0NeverAfk.exe" "- ArcheAge" "300"
