@@ -33,19 +33,19 @@ void Error(int err)
     switch(err)
     {
         case noKeyPress:
-            cout << "Failed to send key. Aborting!" << endl;
+            cout << "\nFailed to send key. Aborting!" << endl;
             break;
         case noKeyRelease:
-            cout << "Failed to release key. Aborting!" << endl;
+            cout << "\nFailed to release key. Aborting!" << endl;
             break;
         case windowNotFound:
-            cout << "Window not found!" << endl;
+            cout << "\nWindow not found!" << endl;
             break;
         case noForeground:
-            cout << "Failed to put window to foreground. Aborting!" << endl;
+            cout << "\nFailed to put window to foreground. Aborting!" << endl;
             break;
         case batError:
-            cout << "The program is not running or the batfile is corrupt!" << endl;
+            cout << "\nThe program is not running or the batfile is corrupt!" << endl;
             break;
     }
 }
@@ -169,11 +169,27 @@ bool InputHandler(const char* inputWindowText, int inputInterval )
     return true;
 }
 
-void PostKey(UINT key)
+bool PostKey(UINT key)
 {
-    PostMessage(window, WM_KEYDOWN, key, 0);
-    Sleep(inputDelay*1000);
-    PostMessage(window, WM_KEYUP, key, 0);
+
+    if(PostMessage(window, WM_KEYDOWN, key, 0) == 0)
+    {
+        Error(noKeyPress);
+        return false;
+    }
+
+    else
+    {
+        Sleep(inputDelay*1000);   //Sleep between key press and release
+        if(PostMessage(window, WM_KEYUP, key, 0) == 0)
+        {
+            Error(noKeyRelease);
+            return false;
+        }
+
+    }
+
+    return true;
 }
 
 
@@ -198,8 +214,11 @@ int main(int argc, char *argv[])
 
     while(running)
     {
-        PostKey(0x20);  //Press space, change this to whatever key you want
-        GiveInfo(true);
+        if(!PostKey(0x20))  //Press space, change this to whatever key you want
+            running = false;
+        else
+            GiveInfo(true);
+
         if(!Wait(interval-inputDelay))
             running = false;
     }
