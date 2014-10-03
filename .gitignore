@@ -1,8 +1,8 @@
-#################  
+﻿#################  
 ## openFrameworks  
 #################  
 
-bin/*  
+[Bb]in/*  
 ![Bb]in/data/  
 [Bb]uild/  
 [Oo]bj/  
