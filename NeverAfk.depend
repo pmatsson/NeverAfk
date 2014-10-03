@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1412356737 source:f:\users\calle\documents\codeblocks\noafk\main.cpp
+	<windows.h>
+	<Tchar.h>
+	<stdio.h>
+	<iostream>
+	<string>
+	<limits>
+
+1412101672 f:\users\calle\documents\codeblocks\noafk\dik.h
+
