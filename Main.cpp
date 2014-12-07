@@ -71,7 +71,7 @@ void Info()
     cout <<   "\t\t*   ~~ NEVER AFK ~~     *\n" ;
     cout <<   "\t\t*      BETA v. "
                       << VERSION << "      *\n" ;
-    cout <<   "\t\t*    Made by Cazze :D   *\n";
+    cout <<   "\t\t*      <carlmats>       *\n";
     cout <<   "\t\t************************* \n\n";
 }
 
@@ -152,7 +152,7 @@ void InputHandler()
     }while(!FindProgram(prog) );
 
     do{
-        cout << "\nChoose interval between key simulations (min 2 seconds): ";
+        cout << "\nChoose interval between key simulations: ";
         interval = ValidInputInt();
     }while(interval<0);
 }
