@@ -5,6 +5,10 @@ I wrote this simple program to prevent AFK timers in games with long queues.
 Tested and works in Archeage and Wildstar, probably most games.
 I take no responsibility if you get banned using this program.
 
+#### Quick setup
+If you don't want to enter all the settings every time, you can follow the example
+in the bat folder and create a bat for your game with your settings.
+
 #### Why does the program not find my game?
 You need to search for (parts of) the name of the window-frame not 
 the name of the game. Look at the border at the  top of the
